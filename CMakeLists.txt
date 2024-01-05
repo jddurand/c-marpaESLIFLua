@@ -26,25 +26,41 @@
 cmake_minimum_required(VERSION 3.26.0 FATAL_ERROR)
 project(marpaESLIFLua LANGUAGES C) # We will set version later
 #
-# Lua dependency
-#
-find_package(Lua REQUIRED)
-message(STATUS "")
-message(STATUS "LUA Setup:")
-message(STATUS "----------")
-message(STATUS "LUA_LIBRARIES     : ${LUA_LIBRARIES}")
-message(STATUS "LUA_INCLUDE_DIR   : ${LUA_INCLUDE_DIR}")
-message(STATUS "LUA_VERSION_STRING: ${LUA_VERSION_STRING}")
-message(STATUS "LUA_VERSION_MAJOR : ${LUA_VERSION_MAJOR}")
-message(STATUS "LUA_VERSION_MINOR : ${LUA_VERSION_MINOR}")
-message(STATUS "LUA_VERSION_PATCH : ${LUA_VERSION_PATCH}")
-message(STATUS "")
-#
 # Get library helper
 #
 include(FetchContent)
 FetchContent_Declare(cmake-helpers GIT_REPOSITORY https://github.com/jddurand/cmake-helpers.git GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(cmake-helpers)
+#
+# Lua distribution is really painful, especially on Windows where the default is to
+# have only binaries, no headers.
+# Since Lua is truely very small, we provide ourself the lua dependency by compiling
+# and installing Lua.
+# This has the advantage that we will be able to run the tests against the two versions we
+# officially support, i.e. lua53 and lua54.
+#
+# Lua dependency
+#
+cmake_helpers_depend(lua53
+  FIND TRUE
+  FIND_PACKAGE_ARGS REQUIRED CONFIG
+  EXTERNALPROJECT_ADD_ARGS
+    URL ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.3.6.tar.gz
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.3/CMakeLists.txt CMakeLists.txt
+  CONFIGURE TRUE
+  BUILD TRUE
+  INSTALL TRUE
+)
+cmake_helpers_depend(lua54
+  FIND TRUE
+  FIND_PACKAGE_ARGS REQUIRED CONFIG
+  EXTERNALPROJECT_ADD_ARGS
+    URL ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.4.6.tar.gz
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.4/CMakeLists.txt CMakeLists.txt
+  CONFIGURE TRUE
+  BUILD TRUE
+  INSTALL TRUE
+)
 #
 # Dependencies
 #
