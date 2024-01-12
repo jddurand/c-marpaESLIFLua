@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26.0 FATAL_ERROR)
-project(lua54 VERSION 5.3.6 LANGUAGES C)
+project(lua VERSION $ENV{LUA_FULL_VERSION} LANGUAGES C)
 #
 # Get library helper
 #
@@ -83,11 +83,17 @@ set(lib_srcs
   src/lutf8lib.c
   src/linit.c
 )
+set(lib_hdrs
+  src/lua.h
+  src/luaconf.h
+)
 #
 # Library creation
 #
 cmake_helpers_library(lua
   SOURCES             ${lib_srcs}
+  HEADERS             ${lib_hdrs}
+  HEADERS_BASE_DIRS   src
   ADD_VERSION_DEFINES FALSE
   EXPORT_HEADER       FALSE
   DEPENDS             ${lua_depends}
@@ -108,9 +114,9 @@ endif()
 #
 # Executables: they are always linked against the static library
 #
-set(lua54_srcs src/lua.c)
-set(luac54_srcs src/luac.c src/ldump.c)
-foreach(exe "lua54" "luac54")
+set(lua_srcs src/lua.c)
+set(luac_srcs src/luac.c src/ldump.c)
+foreach(exe "lua" "luac")
   cmake_helpers_exe(${exe}
     SOURCES                  ${${exe}_srcs}
     DEPENDS                  ${lua_depends}

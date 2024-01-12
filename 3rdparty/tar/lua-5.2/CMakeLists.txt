@@ -51,38 +51,37 @@ include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR} src)
 #
 set(lib_srcs
   src/lapi.c
-  src/lauxlib.c
-  src/lbaselib.c
-  src/lbitlib.c
   src/lcode.c
-  src/lcorolib.c
   src/lctype.c
-  src/ldblib.c
   src/ldebug.c
   src/ldo.c
   src/ldump.c
   src/lfunc.c
   src/lgc.c
-  src/linit.c
-  src/liolib.c
   src/llex.c
-  src/lmathlib.c
   src/lmem.c
-  src/loadlib.c
   src/lobject.c
   src/lopcodes.c
-  src/loslib.c
   src/lparser.c
   src/lstate.c
   src/lstring.c
-  src/lstrlib.c
   src/ltable.c
-  src/ltablib.c
   src/ltm.c
   src/lundump.c
-  src/lutf8lib.c
   src/lvm.c
   src/lzio.c
+  src/lauxlib.c
+  src/lbaselib.c
+  src/lbitlib.c
+  src/lcorolib.c
+  src/ldblib.c
+  src/liolib.c
+  src/lmathlib.c
+  src/loslib.c
+  src/lstrlib.c
+  src/ltablib.c
+  src/loadlib.c
+  src/linit.c
 )
 set(lib_hdrs
   src/lua.h
@@ -103,7 +102,7 @@ cmake_helpers_library(lua
 #
 # General compatibility mode
 #
-add_definitions(-DLUA_COMPAT_5_2)
+add_definitions(-DLUA_COMPAT_ALL)
 #
 # Specific to Win32
 #

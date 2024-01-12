@@ -31,36 +31,64 @@ project(marpaESLIFLua LANGUAGES C) # We will set version later
 include(FetchContent)
 FetchContent_Declare(cmake-helpers GIT_REPOSITORY https://github.com/jddurand/cmake-helpers.git GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(cmake-helpers)
+option(LUA52 "Compile explicitly against lua 5.2" OFF)
+option(LUA53 "Compile explicitly against lua 5.3" OFF)
+option(LUA54 "Compile explicitly against lua 5.4" OFF)
 #
-# Lua distribution is really painful, especially on Windows where the default is to
-# have only binaries, no headers.
-# Since Lua is truely very small, we provide ourself the lua dependency by compiling
-# and installing Lua.
-# This has the advantage that we will be able to run the tests against the two versions we
-# officially support, i.e. lua53 and lua54.
+# LUA52, LUA53, LUA54 options are mutually exclusive
 #
-# Lua dependency
-#
-cmake_helpers_depend(lua53
-  FIND TRUE
-  FIND_PACKAGE_ARGS REQUIRED CONFIG
-  EXTERNALPROJECT_ADD_ARGS
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.3.6.tar.gz
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.3/CMakeLists.txt CMakeLists.txt
-  CONFIGURE TRUE
-  BUILD TRUE
-  INSTALL TRUE
-)
-cmake_helpers_depend(lua54
-  FIND TRUE
-  FIND_PACKAGE_ARGS REQUIRED CONFIG
-  EXTERNALPROJECT_ADD_ARGS
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.4.6.tar.gz
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.4/CMakeLists.txt CMakeLists.txt
-  CONFIGURE TRUE
-  BUILD TRUE
-  INSTALL TRUE
-)
+set(LUAXX 0)
+if(LUA52)
+  set(lua_package lua52)
+  set(lua_full_version 5.2.4)
+  set(lua_version 5.2)
+  set(lua_tarball ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-${lua_full_version}.tar.gz)
+  set(lua_CMakeLists ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.2/CMakeLists.txt)
+  math(EXPR LUAXX "${LUAXX} + 1")
+endif()
+if(LUA53)
+  set(lua_package lua53)
+  set(lua_full_version 5.3.5)
+  set(lua_version 5.3)
+  set(lua_tarball ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-${lua_full_version}.tar.gz)
+  set(lua_CMakeLists ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.3/CMakeLists.txt)
+  math(EXPR LUAXX "${LUAXX} + 1")
+endif()
+if(LUA54)
+  set(lua_package lua54)
+  set(lua_full_version 5.4.6)
+  set(lua_version 5.4)
+  set(lua_tarball ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-${lua_full_version}.tar.gz)
+  set(lua_CMakeLists ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/tar/lua-5.4/CMakeLists.txt)
+  math(EXPR LUAXX "${LUAXX} + 1")
+endif()
+if(LUAXX GREATER 1)
+  message(FATAL_ERROR "LUA52, LUA53, LUA54 options are mutually exclusive")
+elseif(LUAXX EQUAL 1)
+  set(ENV{LUA_FULL_VERSION} ${lua_full_version})
+  cmake_helpers_depend(${lua_package}
+    FIND TRUE
+    FIND_PACKAGE_NAME Lua
+    FIND_PACKAGE_ARGS ${lua_version} REQUIRED
+    EXTERNALPROJECT_ADD_ARGS
+      URL ${lua_tarball}
+      PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${lua_CMakeLists} CMakeLists.txt
+  )
+  set(ENV{LUA_DIR} ${CMAKE_HELPERS_INSTALL_PATH})
+  find_package(Lua ${lua_version} REQUIRED)
+else()
+  find_package(Lua REQUIRED)
+endif()
+message(STATUS "")
+message(STATUS "Lua settings:")
+message(STATUS "-------------")
+message(STATUS "LUA_LIBRARIES: ${LUA_LIBRARIES}")
+message(STATUS "LUA_INCLUDE_DIR: ${LUA_INCLUDE_DIR}")
+message(STATUS "LUA_VERSION_STRING: ${LUA_VERSION_STRING}")
+message(STATUS "LUA_VERSION_MAJOR: ${LUA_VERSION_MAJOR}")
+message(STATUS "LUA_VERSION_MINOR: ${LUA_VERSION_MINOR}")
+message(STATUS "LUA_VERSION_PATCH: ${LUA_VERSION_PATCH}")
+message(STATUS "")
 #
 # Dependencies
 #
@@ -115,6 +143,13 @@ cmake_helpers_library(marpaESLIFLua
   DEPENDS_EXT        ${marpaESLIFLua_depends_ext}
   TARGETS_OUTVAR     targets
 )
+#
+# Apply lua dependencies
+#
+foreach(target IN LISTS targets)
+  target_include_directories(${target} PUBLIC ${LUA_INCLUDE_DIR})
+  target_link_libraries(${target} PUBLIC ${LUA_LIBRARIES})
+endforeach()
 #
 # Lua recommended specifics on the shared library: no prefix, no versioning
 #
