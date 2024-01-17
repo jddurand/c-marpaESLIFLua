@@ -81,18 +81,24 @@ elseif(LUAXX EQUAL 1)
   )
   set(ENV{LUA_DIR} ${CMAKE_HELPERS_INSTALL_PATH})
   find_package(Lua ${lua_version} REQUIRED)
+  #
+  # By definition, we know that we install lua in ${CMAKE_HELPERS_INSTALL_PATH}/${CMAKE_INSTALL_BINDIR}/lua
+  #
+  set(LUA_EXECUTABLE ${CMAKE_HELPERS_INSTALL_PATH}/${CMAKE_INSTALL_BINDIR}/lua)
 else()
   find_package(Lua REQUIRED)
+  find_program(LUA_EXECUTABLE NAMES lua${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR} lua)
 endif()
 message(STATUS "")
 message(STATUS "Lua settings:")
 message(STATUS "-------------")
-message(STATUS "LUA_LIBRARIES: ${LUA_LIBRARIES}")
-message(STATUS "LUA_INCLUDE_DIR: ${LUA_INCLUDE_DIR}")
+message(STATUS "LUA_LIBRARIES     : ${LUA_LIBRARIES}")
+message(STATUS "LUA_INCLUDE_DIR   : ${LUA_INCLUDE_DIR}")
+message(STATUS "LUA_EXECUTABLE    : ${LUA_EXECUTABLE}")
 message(STATUS "LUA_VERSION_STRING: ${LUA_VERSION_STRING}")
-message(STATUS "LUA_VERSION_MAJOR: ${LUA_VERSION_MAJOR}")
-message(STATUS "LUA_VERSION_MINOR: ${LUA_VERSION_MINOR}")
-message(STATUS "LUA_VERSION_PATCH: ${LUA_VERSION_PATCH}")
+message(STATUS "LUA_VERSION_MAJOR : ${LUA_VERSION_MAJOR}")
+message(STATUS "LUA_VERSION_MINOR : ${LUA_VERSION_MINOR}")
+message(STATUS "LUA_VERSION_PATCH : ${LUA_VERSION_PATCH}")
 message(STATUS "")
 #
 # Dependencies
@@ -166,24 +172,26 @@ endforeach()
 # Lua recommended specifics on the shared library: no prefix, no versioning
 #
 set_target_properties (marpaESLIFLua PROPERTIES PREFIX "" NO_SONAME TRUE)
-#
-# Tests. cmake_helpers_exe() has the logic to do path modifications. So we build
-# a fake binary and run test with a custom COMMAND
-#
-include(CTest)
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/marpaESLIFLuaTesterDummy.c [[
+if(LUA_EXECUTABLE)
+  include(CTest)
+  #
+  # Tests. cmake_helpers_exe() has the logic to do path modifications. So we build
+  # a fake binary and run test with a custom COMMAND
+  #
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/marpaESLIFLuaTesterDummy.c [[
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
   exit(0);
 }
 ]])
-cmake_helpers_exe(marpaESLIFLuaTester
-  INSTALL FALSE
-  TEST TRUE
-  SOURCES marpaESLIFLuaTesterDummy.c
-  COMMAND ${CMAKE_COMMAND} -E env ${LUA_EXECUTABLE} test/marpaESLIFLuaTest.lua
-)
+  cmake_helpers_exe(marpaESLIFLuaTester
+    INSTALL FALSE
+    TEST TRUE
+    SOURCES marpaESLIFLuaTesterDummy.c
+    COMMAND ${CMAKE_COMMAND} -E env ${LUA_EXECUTABLE} test/marpaESLIFLuaTest.lua
+  )
+endif()
 #
 # Package
 #
