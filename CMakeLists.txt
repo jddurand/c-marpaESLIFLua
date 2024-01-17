@@ -152,7 +152,14 @@ cmake_helpers_library(marpaESLIFLua
 # Apply lua dependencies
 #
 foreach(target IN LISTS targets)
-  target_include_directories(${target} PUBLIC ${LUA_INCLUDE_DIR})
+  if(LUAXX EQUAL 1)
+    #
+    # We installed it locally
+    #
+    target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${LUA_INCLUDE_DIR}>)
+  else()
+    target_include_directories(${target} PUBLIC ${LUA_INCLUDE_DIR})
+  endif()
   target_link_libraries(${target} PUBLIC ${LUA_LIBRARIES})
 endforeach()
 #
