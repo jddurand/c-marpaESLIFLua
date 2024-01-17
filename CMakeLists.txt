@@ -129,7 +129,7 @@ cmake_helpers_depend(marpaESLIF
   FIND_PACKAGE_ARGS REQUIRED CONFIG
 )
 list(APPEND marpaESLIFLua_find_dependencies "marpaESLIF REQUIRED CONFIG")
-list(APPEND marpaESLIFLua_depends PUBLIC marpaESLIF::marpaESLIF)
+list(APPEND marpaESLIFLua_depends_ext PUBLIC BUILD_INTERFACE marpaESLIF::marpaESLIF)
 #
 # We inherit marpaESLIF's version
 #
