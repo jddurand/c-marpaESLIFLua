@@ -27,7 +27,7 @@ jobs:
     - uses: microsoft/setup-msbuild@v1.3.1
 
     - name: Configure
-      run: cmake -S . -B ../build_folder -G "${{matrix.cmake_generator}}" -A "${{matrix.cmake_generator_platform}}" -D${{matrix.luaversion}}
+      run: cmake -S . -B ../build_folder -G "${{matrix.cmake_generator}}" -A "${{matrix.cmake_generator_platform}}" -D${{matrix.luaversion}}=ON
 
     - name: Build
       run: cmake --build ../build_folder --config ${{env.BUILD_TYPE}}
