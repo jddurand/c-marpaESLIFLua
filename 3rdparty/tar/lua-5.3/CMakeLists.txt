@@ -85,8 +85,10 @@ set(lib_srcs
   src/lzio.c
 )
 set(lib_hdrs
+  src/lauxlib.h
   src/lua.h
   src/luaconf.h
+  src/lualib.h
 )
 #
 # Library creation

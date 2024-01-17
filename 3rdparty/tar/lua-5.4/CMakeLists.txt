@@ -84,8 +84,10 @@ set(lib_srcs
   src/linit.c
 )
 set(lib_hdrs
+  src/lauxlib.h
   src/lua.h
   src/luaconf.h
+  src/lualib.h
 )
 #
 # Library creation
