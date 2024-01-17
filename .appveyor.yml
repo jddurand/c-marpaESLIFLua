@@ -10,6 +10,7 @@ clone_depth: 100     # For other git providers
 #
 environment:
   CTEST_OUTPUT_ON_FAILURE: 1
+  LUA_VERSION: LUA54
   upload_token:
     secure: 
   matrix:
@@ -108,7 +109,7 @@ init:
 #
 # We build using nmake, that is a multi-config generator, so we specify the build type using CMAKE_BUILD_TYPE
 build_script:
-  - cmake -S . -B build_folder -DCMAKE_BUILD_TYPE=RelWithDebInfo -G "NMake Makefiles"
+  - cmake -S . -B build_folder -DCMAKE_BUILD_TYPE=RelWithDebInfo -G "NMake Makefiles" -D%LUA_VERSION%
   - cmake --build build_folder
 
 after_build:
