@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest]
-	luaversion: [LUA52, LUA53, LUA54]
+        luaversion: [LUA52,LUA53,LUA54]
         cmake_generator: ["Visual Studio 17 2022"]
         cmake_generator_platform: ["Win32","x64"]
     runs-on: ${{ matrix.os }}
