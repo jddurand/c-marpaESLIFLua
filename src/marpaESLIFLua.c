@@ -7745,6 +7745,7 @@ static inline short marpaESLIFLua_lua_rawseti(lua_State *L, int index, lua_Integ
 static inline short marpaESLIFLua_lua_seti(lua_State *L, int index, lua_Integer i)
 /****************************************************************************/
 {
+  short rcb;
 #if LUA_VERSION_NUM < 503
   int indexi;
 
@@ -7759,7 +7760,16 @@ static inline short marpaESLIFLua_lua_seti(lua_State *L, int index, lua_Integer 
   lua_seti(L, index, i);                  /* Native lua call */
 #endif
 
-  return 1;
+  rcb = 1;
+#if LUA_VERSION_NUM < 503
+  goto done;
+
+ err:
+  rcb = 0;
+
+ done:
+#endif
+  return rcb;
 }
 #endif
 
@@ -8761,7 +8771,12 @@ static inline short marpaESLIFLua_lua_dump(int *rcip, lua_State *L, lua_Writer w
   int   rci;
   short rcb;
 
+#if LUA_VERSION_NUM <= 502
+  /* We assume this is lua5.2 */
+  rci = lua_dump(L, writer, data);
+#else
   rci = lua_dump(L, writer, data, strip);
+#endif
   if (rcip != NULL) {
     *rcip = rci;
   }
