@@ -185,12 +185,21 @@ int main(int argc, char **argv) {
   exit(0);
 }
 ]])
+  #
+  # Well, we know that marpaESLIFLua shared dll target is named "marpaESLIFLua"
+  #
   cmake_helpers_exe(marpaESLIFLuaTester
     INSTALL FALSE
     TEST TRUE
     SOURCES marpaESLIFLuaTesterDummy.c
-    COMMAND ${CMAKE_COMMAND} -E env ${LUA_EXECUTABLE} test/marpaESLIFLuaTest.lua
+    COMMAND ${CMAKE_COMMAND} -E env ${LUA_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/marpaESLIFLuaTest.lua
+    ENVIRONMENTS
+      LUA_PATH=unset:
+      LUA_CPATH=set:$<TARGET_FILE:marpaESLIFLua>
   )
+  #
+  # Lua will try to find marpaESLIFLua shared library
+  #
 endif()
 #
 # Package
