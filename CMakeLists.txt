@@ -172,6 +172,9 @@ endforeach()
 # Lua recommended specifics on the shared library: no prefix, no versioning
 #
 set_target_properties (marpaESLIFLua PROPERTIES PREFIX "" NO_SONAME TRUE)
+#
+# We declare tests if LUA_EXECUTABLE is set
+#
 if(LUA_EXECUTABLE)
   include(CTest)
   #
@@ -185,9 +188,6 @@ int main(int argc, char **argv) {
   exit(0);
 }
 ]])
-  #
-  # Well, we know that marpaESLIFLua shared dll target is named "marpaESLIFLua"
-  #
   cmake_helpers_exe(marpaESLIFLuaTester
     INSTALL FALSE
     TEST TRUE
@@ -197,9 +197,6 @@ int main(int argc, char **argv) {
       LUA_PATH=unset:
       LUA_CPATH=set:$<TARGET_FILE:marpaESLIFLua>
   )
-  #
-  # Lua will try to find marpaESLIFLua shared library
-  #
 endif()
 #
 # Package
