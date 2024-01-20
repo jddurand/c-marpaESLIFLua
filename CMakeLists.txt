@@ -36,6 +36,11 @@ set(PROJECT_VERSION_TWEAK 1)
 include(FetchContent)
 FetchContent_Declare(cmake-helpers GIT_REPOSITORY https://github.com/jddurand/cmake-helpers.git GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(cmake-helpers)
+#
+# The use of LUAXX option is STRONGLY DISCOURAGED when doing production package. This will create a marpaESLIFLua
+# dependant on a local version of Lua, that may very well NOT fulfill your production system.
+# Setting no option, will call the standard find_package(Lua REQUIRED) that should match production systems.
+#
 option(LUA52 "Compile explicitly against lua 5.2" OFF)
 option(LUA53 "Compile explicitly against lua 5.3" OFF)
 option(LUA54 "Compile explicitly against lua 5.4" OFF)
@@ -73,39 +78,41 @@ elseif(LUAXX EQUAL 1)
   set(ENV{LUA_FULL_VERSION} ${lua_full_version})
   cmake_helpers_depend(${lua_package}
     FIND TRUE
-    FIND_PACKAGE_NAME Lua
-    FIND_PACKAGE_ARGS ${lua_version} REQUIRED
+    FIND_PACKAGE_NAME lua
+    FIND_PACKAGE_ARGS ${lua_version} REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${CMAKE_HELPERS_INSTALL_PATH}/${CMAKE_HELPERS_INSTALL_CMAKEDIR}
     EXTERNALPROJECT_ADD_ARGS
       URL ${lua_tarball}
       PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${lua_CMakeLists} CMakeLists.txt
   )
-  set(ENV{LUA_DIR} ${CMAKE_HELPERS_INSTALL_PATH})
-  find_package(Lua ${lua_version} REQUIRED)
-  #
-  # By definition, we know that we install lua in ${CMAKE_HELPERS_INSTALL_PATH}/${CMAKE_INSTALL_BINDIR}/lua
-  #
-  set(LUA_EXECUTABLE ${CMAKE_HELPERS_INSTALL_PATH}/${CMAKE_INSTALL_BINDIR}/lua)
+  set(LUA_EXECUTABLE $<TARGET_FILE:lua::lua_shared_exe>)
 else()
   find_package(Lua REQUIRED)
   find_program(LUA_EXECUTABLE NAMES lua${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR} lua)
+  message(STATUS "")
+  message(STATUS "Lua settings:")
+  message(STATUS "-------------")
+  message(STATUS "LUA_LIBRARIES     : ${LUA_LIBRARIES}")
+  message(STATUS "LUA_INCLUDE_DIR   : ${LUA_INCLUDE_DIR}")
+  message(STATUS "LUA_EXECUTABLE    : ${LUA_EXECUTABLE}")
+  message(STATUS "LUA_VERSION_STRING: ${LUA_VERSION_STRING}")
+  message(STATUS "LUA_VERSION_MAJOR : ${LUA_VERSION_MAJOR}")
+  message(STATUS "LUA_VERSION_MINOR : ${LUA_VERSION_MINOR}")
+  message(STATUS "LUA_VERSION_PATCH : ${LUA_VERSION_PATCH}")
+  message(STATUS "")
 endif()
-message(STATUS "")
-message(STATUS "Lua settings:")
-message(STATUS "-------------")
-message(STATUS "LUA_LIBRARIES     : ${LUA_LIBRARIES}")
-message(STATUS "LUA_INCLUDE_DIR   : ${LUA_INCLUDE_DIR}")
-message(STATUS "LUA_EXECUTABLE    : ${LUA_EXECUTABLE}")
-message(STATUS "LUA_VERSION_STRING: ${LUA_VERSION_STRING}")
-message(STATUS "LUA_VERSION_MAJOR : ${LUA_VERSION_MAJOR}")
-message(STATUS "LUA_VERSION_MINOR : ${LUA_VERSION_MINOR}")
-message(STATUS "LUA_VERSION_PATCH : ${LUA_VERSION_PATCH}")
-message(STATUS "")
 #
 # Dependencies
 #
 set(marpaESLIFLua_depends)
 set(marpaESLIFLua_depends_ext)
 set(marpaESLIFLua_find_dependencies)
+if(LUAXX EQUAL 1)
+  list(APPEND marpaESLIFLua_find_dependencies "Lua REQUIRED")
+  list(APPEND marpaESLIFLua_depends PUBLIC lua::lua)
+else()
+  list(APPEND marpaESLIFLua_find_dependencies "Lua REQUIRED")
+  list(APPEND marpaESLIFLua_depends PUBLIC ${LUA_LIBRARIES})
+endif()
 #
 # genericLogger dependency
 #
@@ -155,19 +162,13 @@ cmake_helpers_library(marpaESLIFLua
   TARGETS_OUTVAR     targets
 )
 #
-# Apply lua dependencies
+# Get lua include directories when using standard build
 #
-foreach(target IN LISTS targets)
-  if(LUAXX EQUAL 1)
-    #
-    # We installed it locally
-    #
-    target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${LUA_INCLUDE_DIR}>)
-  else()
+if(NOT LUAXX EQUAL 1)
+  foreach(target IN LISTS targets)
     target_include_directories(${target} PUBLIC ${LUA_INCLUDE_DIR})
-  endif()
-  target_link_libraries(${target} PUBLIC ${LUA_LIBRARIES})
-endforeach()
+  endforeach()
+endif()
 #
 # Lua recommended specifics on the shared library: no prefix, no versioning
 #
@@ -195,7 +196,7 @@ int main(int argc, char **argv) {
     COMMAND ${CMAKE_COMMAND} -E env ${LUA_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/marpaESLIFLuaTest.lua
     ENVIRONMENTS
       LUA_PATH=unset:
-      LUA_CPATH=set:$<TARGET_FILE:marpaESLIFLua>
+      LUA_CPATH=path_list_prepend:$<TARGET_FILE:marpaESLIFLua>
   )
 endif()
 #

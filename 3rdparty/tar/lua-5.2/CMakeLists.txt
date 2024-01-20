@@ -93,13 +93,15 @@ set(lib_hdrs
 # Library creation
 #
 cmake_helpers_library(lua
-  SOURCES             ${lib_srcs}
-  HEADERS             ${lib_hdrs}
-  HEADERS_BASE_DIRS   src
-  ADD_VERSION_DEFINES FALSE
-  EXPORT_HEADER       FALSE
-  DEPENDS             ${lua_depends}
-  TARGETS_OUTVAR      targets
+  SOURCES                        ${lib_srcs}
+  HEADERS                        ${lib_hdrs}
+  HEADERS_BASE_DIRS              src
+  WITH_VISIBILITY_PRESET_HIDDEN  FALSE
+  WITH_VISIBILITY_INLINES_HIDDEN FALSE
+  ADD_VERSION_DEFINES            FALSE
+  EXPORT_HEADER                  FALSE
+  DEPENDS                        ${lua_depends}
+  TARGETS_OUTVAR                 targets
 )
 #
 # General compatibility mode
@@ -114,20 +116,13 @@ if(WIN32)
   endforeach()
 endif()
 #
-# Executables: they are always linked against the static library
+# Executables: only lua is provided
 #
-set(lua_srcs src/lua.c)
-set(luac_srcs src/luac.c src/ldump.c src/lopcodes)
-foreach(exe "lua" "luac")
-  cmake_helpers_exe(${exe}
-    SOURCES                  ${${exe}_srcs}
-    DEPENDS                  ${lua_depends}
-    #
-    # We are only interested by the version linked with the static library
-    #
-    EXE_USING_SHARED_LIBRARY FALSE
-    INSTALL                  TRUE
-    TEST                     FALSE
-  )
-  cmake_helpers_call(set_target_properties ${exe}_static_exe PROPERTIES OUTPUT_NAME ${exe})
-endforeach()
+cmake_helpers_exe(lua
+  SOURCES                  src/lua.c
+  DEPENDS                  ${lua_depends}
+  EXE_USING_STATIC_LIBRARY FALSE
+  INSTALL                  TRUE
+  TEST                     FALSE
+)
+cmake_helpers_call(set_target_properties lua_shared_exe PROPERTIES OUTPUT_NAME lua)
