@@ -19,9 +19,10 @@ if(CMAKE_MATH_LIBS)
 endif()
 #
 # dl lib
+# On Apple dlopen/dlcose are available without -ldl
 #
 if(NOT WIN32)
-  if(CMAKE_DL_LIBS)
+  if(CMAKE_DL_LIBS OR APPLE)
     add_definitions(-DLUA_USE_DLOPEN)
     list(APPEND lua_depends PUBLIC ${CMAKE_DL_LIBS})
   endif()
@@ -31,6 +32,12 @@ endif()
 #
 if(LINUX OR APPLE)
   add_definitions(-DLUA_USE_POSIX)
+endif()
+#
+# Long long
+#
+if(SIZEOF_LONG_LONG)
+  add_definitions(-DLUA_USE_LONGLONG)
 endif()
 #
 # Threads
