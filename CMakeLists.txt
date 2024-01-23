@@ -156,6 +156,7 @@ set(PROJECT_VERSION_PATCH ${marpaESLIF_VERSION_PATCH})
 # Create library
 #
 cmake_helpers_library(marpaESLIFLua
+  CONFIG_ARGS        include/marpaESLIFLua/internal/config.h.in include/marpaESLIFLua/internal/config.h
   FIND_DEPENDENCIES  ${marpaESLIFLua_find_dependencies}
   DEPENDS            ${marpaESLIFLua_depends}
   DEPENDS_EXT        ${marpaESLIFLua_depends_ext}
