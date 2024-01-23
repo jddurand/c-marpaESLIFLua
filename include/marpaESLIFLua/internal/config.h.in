@@ -19,9 +19,9 @@
 /* extreme caution                                          */
 #cmakedefine C_GCC_FUNC_ATTRIBUTE_FLATTEN @C_GCC_FUNC_ATTRIBUTE_FLATTEN@
 #ifdef C_GCC_FUNC_ATTRIBUTE_FLATTEN
-#  define MARPAESLIF_FUNC_ATTRIBUTE_FLATTEN C_GCC_FUNC_ATTRIBUTE_FLATTEN
+#  define MARPAESLIFLUA_FUNC_ATTRIBUTE_FLATTEN C_GCC_FUNC_ATTRIBUTE_FLATTEN
 #else
-#  define MARPAESLIF_FUNC_ATTRIBUTE_FLATTEN /* Define it to nothing */
+#  define MARPAESLIFLUA_FUNC_ATTRIBUTE_FLATTEN /* Define it to nothing */
 #endif
 
 #cmakedefine HAVE_SYS_TYPES
@@ -55,9 +55,6 @@
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
 #endif
-
-typedef @MARPAESLIF_UINT32_T@ marpaESLIF_uint32_t;
-typedef @MARPAESLIF_UINT64_T@ marpaESLIF_uint64_t;
 
 #cmakedefine C_STRTOLD @C_STRTOLD@
 #cmakedefine C_STRTOD @C_STRTOD@
@@ -130,11 +127,11 @@ typedef @MARPAESLIF_UINT64_T@ marpaESLIF_uint64_t;
 /* __builtin_expect support */
 #cmakedefine C___BUILTIN_EXPECT @C___BUILTIN_EXPECT@
 #ifdef C___BUILTIN_EXPECT
-#  define MARPAESLIF_LIKELY(x)    C___BUILTIN_EXPECT(x, 1)
-#  define MARPAESLIF_UNLIKELY(x)  C___BUILTIN_EXPECT(x, 0)
+#  define MARPAESLIFLUA_LIKELY(x)    C___BUILTIN_EXPECT(x, 1)
+#  define MARPAESLIFLUA_UNLIKELY(x)  C___BUILTIN_EXPECT(x, 0)
 #else
-#  define MARPAESLIF_LIKELY(x)    x
-#  define MARPAESLIF_UNLIKELY(x)  x
+#  define MARPAESLIFLUA_LIKELY(x)    x
+#  define MARPAESLIFLUA_UNLIKELY(x)  x
 #endif /* C___BUILTIN_EXPECT */
 
 /* forceinline support */
@@ -157,8 +154,8 @@ typedef @MARPAESLIF_UINT64_T@ marpaESLIF_uint64_t;
  * genericStack performance is vital
  */
 #define GENERICSTACK_INLINE forceinline
-#define GENERICSTACK_LIKELY(x) MARPAESLIF_LIKELY(x)
-#define GENERICSTACK_UNLIKELY(x) MARPAESLIF_UNLIKELY(x)
+#define GENERICSTACK_LIKELY(x) MARPAESLIFLUA_LIKELY(x)
+#define GENERICSTACK_UNLIKELY(x) MARPAESLIFLUA_UNLIKELY(x)
 
 /* Just to make things clear in the code */
 #define noinline

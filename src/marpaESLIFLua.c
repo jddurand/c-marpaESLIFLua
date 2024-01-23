@@ -5,6 +5,9 @@
 #include "lualib.h"     /* As per CMake doc */
 #ifdef MARPAESLIFLUA_EMBEDDED
 #include "marpaESLIF/internal/config.h"
+#define MARPAESLIFLUA_FUNC_ATTRIBUTE_FLATTEN MARPAESLIF_FUNC_ATTRIBUTE_FLATTEN
+#define MARPAESLIFLUA_LIKELY(x) MARPAESLIF_LIKELY(x)
+#define MARPAESLIFLUA_UNLIKELY(x) MARPAESLIF_UNLIKELY(x)
 #else
 #include "marpaESLIFLua/internal/config.h"
 #endif
