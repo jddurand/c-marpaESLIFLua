@@ -3,7 +3,11 @@
 #include "lua.h"        /* As per CMake doc */
 #include "lauxlib.h"    /* As per CMake doc */
 #include "lualib.h"     /* As per CMake doc */
+#ifdef MARPAESLIFLUA_EMBEDDED
+#include "marpaESLIF/internal/config.h"
+#else
 #include "marpaESLIFLua/internal/config.h"
+#endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
