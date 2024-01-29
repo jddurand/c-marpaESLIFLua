@@ -84,7 +84,10 @@ elseif(LUAXX EQUAL 1)
       URL ${lua_tarball}
       PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${lua_CMakeLists} CMakeLists.txt
   )
-  set(LUA_EXECUTABLE $<TARGET_FILE:lua::lua_shared_exe>)
+  #
+  # We know exactly where is the executable
+  #
+  set(LUA_EXECUTABLE ${CMAKE_HELPERS_INSTALL_PATH}/${CMAKE_INSTALL_BINDIR}/lua${CMAKE_EXECUTABLE_SUFFIX_C})
 else()
   find_package(Lua REQUIRED)
   find_program(LUA_EXECUTABLE NAMES lua${LUA_VERSION_MAJOR}.${LUA_VERSION_MINOR} lua)
