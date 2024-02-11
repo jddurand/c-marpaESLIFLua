@@ -145,7 +145,7 @@ list(APPEND marpaESLIFLua_depends PUBLIC genericStack::genericStack)
 #
 set(marpaESLIF_git https://github.com/jddurand/c-marpaESLIF.git)
 cmake_helpers_depend(marpaESLIF
-  EXTERNALPROJECT_ADD_ARGS DOWNLOAD_COMMAND ${GIT_EXECUTABLE} clone --single-branch --branch cmake_helpers ${marpaESLIF_git} ${CMAKE_CURRENT_BINARY_DIR}/_deps/marpaeslif-src
+  EXTERNALPROJECT_ADD_ARGS GIT_REPOSITORY ${marpaESLIF_git} GIT_SHALLOW TRUE
   FIND_PACKAGE_ARGS REQUIRED CONFIG
 )
 list(APPEND marpaESLIFLua_find_dependencies "marpaESLIF REQUIRED CONFIG")
