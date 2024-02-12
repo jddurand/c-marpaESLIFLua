@@ -118,7 +118,9 @@ if(LUAXX EQUAL 1)
   list(APPEND marpaESLIFLua_depends PUBLIC lua::lua)
 else()
   list(APPEND marpaESLIFLua_find_dependencies "Lua REQUIRED")
-  list(APPEND marpaESLIFLua_depends PUBLIC ${LUA_LIBRARIES})
+  foreach(lua_library IN LISTS LUA_LIBRARIES)
+    list(APPEND marpaESLIFLua_depends PUBLIC ${lua_library})
+  endforeach()
 endif()
 #
 # genericLogger dependency
